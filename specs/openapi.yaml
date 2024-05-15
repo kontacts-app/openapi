@@ -1,0 +1,132 @@
+openapi: "3.0.3"
+info:
+  title: Kontacts API
+  version: "1.0.0"
+  description: |
+    The Kontacts API allows you to manage remotely your set of contacts.
+tags:
+  - name: Contacts
+    description: APIs for Contacts
+
+paths:
+  /contacts:
+    get:
+      description: Returns a list of all contacts.
+      operationId: getAll
+      tags:
+        - "Contacts"
+      responses:
+        "200":
+          description: Contact list response
+          content:
+            application/vdn.api+json:
+              schema:
+                $ref: "#/components/schemas/Contacts"
+        "400":
+          description: "Bad Request"
+    post:
+      description: "[Creates](https://jsonapi.org/format/#crud-creating) a new contact."
+      operationId: createNew
+      tags:
+        - "Contacts"
+      requestBody:
+        description: Contact to create
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/NewContact"
+      responses:
+        "201":
+          description: "[Created](https://jsonapi.org/format/#crud-creating-responses-201)"
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "400":
+          description: "Bad Request"
+  /contacts/{id}:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      description: Returns a single contact by id.
+      operationId: getById
+      tags:
+        - "Contacts"
+      responses:
+        "200":
+          description: "[OK](https://jsonapi.org/format/#fetching-resources-responses-200)"
+          content:
+            application/vdn.api+json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "404":
+          description: "[Not Found](https://jsonapi.org/format/#fetching-resources-responses-404)"
+        "400":
+          description: "Bad Request"
+    delete:
+      description: "[Deletes](https://jsonapi.org/format/#crud-deleting) a contact by id."
+      operationId: deleteById
+      tags:
+        - "Contacts"
+      responses:
+        "204":
+          description: "[Deleted](https://jsonapi.org/format/#fetching-resources-responses-204)"
+        "404":
+          description: "[Not Found](https://jsonapi.org/format/#fetching-resources-responses-404)"
+        "400":
+          description: "Bad Request"
+    patch:
+      description: "[Updates](https://jsonapi.org/format/#crud-updating) a contact by id."
+      operationId: updateById
+      tags:
+        - "Contacts"
+      requestBody:
+        description: Contact data update
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "#/components/schemas/NewContact"
+      responses:
+        "200":
+          description: "[Updated](https://jsonapi.org/format/#fetching-resources-responses-200)"
+        "404":
+          description: "[Not Found](https://jsonapi.org/format/#fetching-resources-responses-404)"
+        "400":
+          description: "Bad Request"
+
+components:
+  schemas:
+    Contact:
+      description: Contact resource
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    Contacts:
+      description: List of Contacts
+      type: array
+      items:
+        $ref: "#/components/schemas/Contact"
+    NewContact:
+      description: New Contact resource
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+  parameters:
+    id:
+      name: id
+      in: path
+      description: The Contact id
+      required: true
+      schema:
+        type: string

@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ trunk ]
+  pull_request:
+  create:
+
+jobs:
+  gradlew-validation:
+    name: "Gradle Wrapper Validation"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: gradle/wrapper-validation-action@v2.1.1
+
+  android:
+    name: "Build"
+    needs: gradlew-validation
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4.1.1
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4.1.0
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3.2.0
+
+      - uses: gradle/gradle-build-action@v3
+        with:
+          cache-disabled: true
+
+      - name: Generate API libraries
+        run: |
+          ./gradlew -Dorg.gradle.jvmargs=-Xmx2048m --stacktrace --continue \
+            genKotlinSpring genKtorClient
